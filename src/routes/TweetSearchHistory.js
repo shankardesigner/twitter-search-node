@@ -1,5 +1,6 @@
 const express = require('express');
 const Twit = require('twit');
+require('dotenv').config()
 
 const T = new Twit({
     consumer_key:         process.env.CONSUMER_KEY,
