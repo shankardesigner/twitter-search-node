@@ -1,8 +1,8 @@
-const mongoose = require('mongoose')
-const validator = require('validator')
-const bcrypt = require('bcryptjs')
+const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -23,7 +23,12 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
         minLength: 7
-    }})
+    },
+    searchHistory: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"SearcHistory"
+    }]
+})
 
 userSchema.pre('save', async function (next) {
     const user = this
