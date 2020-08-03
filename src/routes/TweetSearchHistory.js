@@ -22,15 +22,18 @@ const T = new Twit({
   router.get('/tweets', async (req, res) => {
     const query = req.query.query;
     const token = req.headers.authorization;
-    let searchTerms = "%23COVID19"
-    
-    if(token) {
+    const defaultQuery = "%23LatestNews";
+    let searchTerms = defaultQuery;
+
+    if(token != undefined && token != null) {
         const decodedToken = await decodeJwtToken(token);
         const id = decodedToken.payload.id;
         const exp = decodedToken.payload.exp;
 
         if(exp > Date.now()/1000) {
-            searchTerms = query;
+
+            if(query != undefined) searchTerms = query;
+
             const currentUser = await User.findById(id);
             const history = currentUser.searchHistory;
 
@@ -46,8 +49,7 @@ const T = new Twit({
         }
     }
 
-    T.get('search/tweets', { q: searchTerms, count: 15 }, async function(err, {statuses}=data, response) {
-
+    T.get('search/tweets', { q: searchTerms.length > 0 ? searchTerms : defaultQuery, count: 15 }, async function(err, {statuses}=data, response) {
         const embededData = await statuses.map(tweet => {
             
             return {
@@ -55,9 +57,9 @@ const T = new Twit({
                 "tweetText":tweet.text,
                 "created_at":Date.parse(tweet.created_at),
                 "tweetId":tweet.id,
-                "mediaImage": tweet.entities.media ? ([
-                    {"media_image" : tweet.entities.media}
-                ]) : 0,
+                // "mediaImage": tweet.entities.media ? ([
+                //     {"media_image" : tweet.entities.media}
+                // ]) : 0,
                 "profile_image_url": tweet.user.profile_image_url,
                 "retweeted_status": tweet.retweeted_status ? ([
                     {"retweet_count" : tweet.retweeted_status.retweet_count,
