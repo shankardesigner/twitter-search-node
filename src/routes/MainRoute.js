@@ -2,7 +2,7 @@ const express = require('express')
 
 const router = express.Router()
 
-router.post('/', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         res.send('IF YOU ARE SEEING THIS THEN IT WORKS!!')
     } catch (error) {
