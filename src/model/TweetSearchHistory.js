@@ -2,14 +2,13 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 
 const searchHistorySchema = new mongoose.Schema({
-    createdAt: new Date(),
+    createdAt: {
+        type: Date,
+        required: true,
+        default: new Date()
+    },
     keyword: {
         type: String,
-        required: true
-    },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
         required: true
     }
 });

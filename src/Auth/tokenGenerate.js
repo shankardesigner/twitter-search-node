@@ -4,7 +4,7 @@ const generateAuthToken = async (id) => {
     const generatedToken = jwt.sign({
         payload: {
             id,
-            exp: Math.floor(Date.now() / 1000) + (60 * 60)
+            exp: Math.floor(Date.now()) + (60 * 60)
         }
       }, process.env.JWT_KEY);
 

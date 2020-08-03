@@ -1,5 +1,9 @@
 const express = require('express');
 const Twit = require('twit');
+const decodeJwtToken = require('../Auth/decodeToken');
+const User = require('../model/User');
+const TweetSearchHistory = require('../model/TweetSearchHistory');
+const { json } = require('body-parser');
 require('dotenv').config()
 
 const T = new Twit({
@@ -13,13 +17,38 @@ const T = new Twit({
 
   const router = express.Router()
 
-
   module.exports = router
 
-  router.get('/tweets', (req, res) => {
-    T.get('search/tweets', { q: '%23nepal', count: 15 }, function(err, {statuses}=data, response) {
+  router.get('/tweets', async (req, res) => {
+    const query = req.query.query;
+    const token = req.headers.authorization;
+    let searchTerms = "%23COVID19"
+    
+    if(token) {
+        const decodedToken = await decodeJwtToken(token);
+        const id = decodedToken.payload.id;
+        const exp = decodedToken.payload.exp;
 
-        const embededData = statuses.map(tweet => {
+        if(exp > Date.now()/1000) {
+            searchTerms = query;
+            const currentUser = await User.findById(id);
+            const history = currentUser.searchHistory;
+
+            if(query != undefined && currentUser != null) {
+                await TweetSearchHistory({keyword:searchTerms}).save().then(search => {
+                    currentUser.searchHistory.push(search._id);
+                    currentUser.save();
+                });
+            }
+
+            // const getSearchByUSer = JSON.parse(history.map(id => TweetSearchHistory.findOne({_id: id})));
+            // console.log(getSearchByUSer)
+        }
+    }
+
+    T.get('search/tweets', { q: searchTerms, count: 15 }, async function(err, {statuses}=data, response) {
+
+        const embededData = await statuses.map(tweet => {
             
             return {
                 "screen_name":tweet.user.screen_name,

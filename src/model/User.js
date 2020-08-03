@@ -40,7 +40,7 @@ userSchema.pre('save', async function (next) {
 
 userSchema.statics.findByCredentials = async (email, password) => {
     try {
-        const user = await User.findOne({ email} )
+        const user = await User.findOne({ email} ).exec()
         if (!user) {
             throw new Error({ error: 'Invalid login credentials' })
         }
