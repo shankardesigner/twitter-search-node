@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken')
 
-const generateAuthToken = async (id) => {
+const generateAuthToken = async (id,name) => {
     const generatedToken = jwt.sign({
         payload: {
             id,
-            exp: Math.floor(Date.now()) + (60 * 60)
+            name,
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7) //7days => 604800
         }
       }, process.env.JWT_KEY);
 
